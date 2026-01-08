@@ -51,6 +51,9 @@ class RegisteredUserController extends Controller
 
         $user->businesses()->attach($business->id, ['role' => 'owner']);
 
+        $user->current_business_id = $business->id;
+        $user->save();
+
         event(new Registered($user));
 
         Auth::login($user);
