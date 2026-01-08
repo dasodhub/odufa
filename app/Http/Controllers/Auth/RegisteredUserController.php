@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Business;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Pest\Support\Str;
 
 class RegisteredUserController extends Controller
 {
@@ -40,6 +42,14 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        $business = Business::create([
+            'name' => $request->name . "'s Business",
+            'slug' => Str::slugify($request->name . '-' . uniqid()),
+            'type' => 'retail',
+        ]);
+
+        $user->businesses()->attach($business->id, ['role' => 'owner']);
 
         event(new Registered($user));
 
